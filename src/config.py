@@ -29,8 +29,8 @@ FLAGS = ["ironia", "giria_meme", "suspeita_coordenacao", "irrelevante"]
 TZ_LOCAL = "America/Sao_Paulo"
 HORA_CORTE = 17  # 17:00 BRT (parametrizável nos testes de robustez)
 
-# Extração de tickers (B3): 4 letras + 1-2 dígitos (PETR4, ITUB3, BOVA11)
-REGEX_TICKER = r"\b([A-Z]{4}\d{1,2})\b"
+# Extração de tickers (B3): 4 letras + 1-2 dígitos, aceitando maiúsculas e minúsculas, além do fracionário (ex: petr4, PETR4F)
+REGEX_TICKER = r"\b([A-Za-z]{4}\d{1,2}[Ff]?)\b"
 # Palavras de 4 letras + dígito que NÃO são tickers (ampliar durante a exploração)
 STOPLIST_TICKERS = {"COVID19", "WIN10", "FIFA22", "FIFA23", "FIFA24", "FIFA25", "FIFA26", "COP26", "COP27", "COP28"}
 
@@ -84,6 +84,6 @@ HAC_LAGS = 5
 ALFA = 0.05
 
 # LLM
-LLM_MODEL_PADRAO = "claude-sonnet-5-5"
+LLM_MODEL_PADRAO = "gemini-3.8-flash"
 LLM_BATCH = 20
 LLM_MAX_RETRIES = 3

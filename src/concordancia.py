@@ -23,9 +23,15 @@ CATEGORIAS_ERRO = [
 
 
 def juntar(gabarito: pd.DataFrame, llm: pd.DataFrame, texto: pd.DataFrame | None = None) -> pd.DataFrame:
-    m = gabarito.merge(llm[["id", "sentimento", "confianca", "ironia", "justificativa_curta"]], on="id", suffixes=("_hum", "_llm"))
+    gab = gabarito.copy()
+    gab["id"] = gab["id"].astype(str)
+    ll = llm.copy()
+    ll["id"] = ll["id"].astype(str)
+    m = gab.merge(ll[["id", "sentimento", "confianca", "ironia", "justificativa_curta"]], on="id", suffixes=("_hum", "_llm"))
     if texto is not None:
-        m = m.merge(texto[["id", "texto"]], on="id", how="left")
+        tx = texto.copy()
+        tx["id"] = tx["id"].astype(str)
+        m = m.merge(tx[["id", "texto"]], on="id", how="left")
     return m
 
 
@@ -84,9 +90,12 @@ def tabela_kappas(resultados: dict[str, pd.DataFrame]) -> pd.DataFrame:
                 "kappa_ponderado": k["kappa_ponderado"],
                 "acuracia": k["acuracia"],
                 "f1_macro": k["f1_macro"],
+                "n_sem_ironia": int(ki.loc["sem_ironia", "n"]),
                 "kappa_sem_ironia": ki.loc["sem_ironia", "kappa"],
-                "kappa_com_ironia": ki.loc["com_ironia", "kappa"],
+                "acuracia_sem_ironia": ki.loc["sem_ironia", "acuracia"],
                 "n_com_ironia": int(ki.loc["com_ironia", "n"]),
+                "kappa_com_ironia": ki.loc["com_ironia", "kappa"],
+                "acuracia_com_ironia": ki.loc["com_ironia", "acuracia"],
             }
         )
     return pd.DataFrame(linhas)

@@ -119,12 +119,16 @@ def cmd_coordenacao(_a):
     from . import mercado
 
     posts = pd.read_parquet(config.POSTS_PARQUET)
+    posts["id"] = posts["id"].astype(str)
     liq = None
     try:
         from .limpeza import explodir_tickers
 
         tks = explodir_tickers(posts)["ticker"].unique().tolist()
-        precos = mercado.baixar_precos(tks, posts["data_hora"].min().date(), (posts["data_hora"].max() + pd.Timedelta(days=10)).date())
+        # Baixa histórico começando 40 dias antes para garantir cálculo correto de liquidez
+        ini = (posts["data_hora"].min() - pd.Timedelta(days=40)).date()
+        fim = (posts["data_hora"].max() + pd.Timedelta(days=10)).date()
+        precos = mercado.baixar_precos(tks, ini, fim)
         liq = mercado.liquidez_por_ticker(precos)
     except Exception as e:  # noqa: BLE001
         print(f"aviso: sem liquidez ({e}); pesos renormalizados")
@@ -147,17 +151,33 @@ def cmd_preditivo(a):
     from .limpeza import explodir_tickers
 
     posts = pd.read_parquet(config.POSTS_PARQUET)
+    posts["id"] = posts["id"].astype(str)
     llm = pd.read_parquet(config.LLM_PARQUET)
-    ex = explodir_tickers(posts)[["id", "autor_id", "data_hora", "ticker"]]
+    llm["id"] = llm["id"].astype(str)
+
+    # Decisão metodológica: por padrão usa posts com um único ticker (n_tickers == 1)
+    # para evitar contaminação de sentimento entre ativos diferentes no mesmo texto
+    posts_modelo = posts[posts["n_tickers"] == 1] if not a.todos_tickers else posts
+    ex = explodir_tickers(posts_modelo)[["id", "autor_id", "data_hora", "ticker"]]
     tks = ex["ticker"].unique().tolist()
-    ini, fim = ex["data_hora"].min().date(), (ex["data_hora"].max() + pd.Timedelta(days=15)).date()
+
+    # Inicia 40 dias antes do primeiro post para garantir 20 pregões prévios de volume anormal
+    ini = (posts["data_hora"].min() - pd.Timedelta(days=40)).date()
+    fim = (posts["data_hora"].max() + pd.Timedelta(days=15)).date()
     precos = mercado.baixar_precos(tks, ini, fim)
     cal = mercado.baixar_calendario(ini, fim)
-    merc = mercado.construir_painel_mercado(precos)
+    ibov = mercado.baixar_ibov(ini, fim)
+    merc = mercado.construir_painel_mercado(precos, ibov=ibov)
+
+    hora_corte_val = a.hora_corte
+    if str(hora_corte_val).isdigit():
+        hora_corte_val = int(hora_corte_val)
 
     def sinal(versao_col: pd.DataFrame, excluir=None):
+        versao_col = versao_col.copy()
+        versao_col["id"] = versao_col["id"].astype(str)
         d = ex.merge(versao_col[["id", "sentimento"]], on="id")
-        idx = pr.indice_diario(d, cal, hora_corte=a.hora_corte, n_min=a.n_min, um_voto_por_autor=a.um_voto, excluir_ids=excluir)
+        idx = pr.indice_diario(d, cal, hora_corte=hora_corte_val, n_min=a.n_min, um_voto_por_autor=a.um_voto, excluir_ids=excluir)
         return pr.montar_painel(idx, merc)
 
     v1 = llm[llm["versao_prompt"] == "v1"].copy()
@@ -190,7 +210,8 @@ def main(argv=None):
     s.add_argument("--modelo", default=None)
     s.set_defaults(fn=cmd_llm)
     s = sp.add_parser("preditivo")
-    s.add_argument("--hora-corte", type=int, default=config.HORA_CORTE)
+    s.add_argument("--hora-corte", default="dinamico", help="hora de corte do pregão ('dinamico' [17h/18h sazonal B3], ou int como 17/18)")
+    s.add_argument("--todos-tickers", action="store_true", help="inclui posts com múltiplos tickers (padrão usa apenas n_tickers==1)")
     s.add_argument("--n-min", type=int, default=config.N_MIN_POSTS)
     s.add_argument("--um-voto", action="store_true", help="1 voto por autor por ticker-dia (robustez)")
     s.add_argument("--efeitos-fixos", action="store_true")

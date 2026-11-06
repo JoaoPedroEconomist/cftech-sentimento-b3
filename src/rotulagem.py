@@ -11,7 +11,11 @@ COLUNAS_ROTULO = ["id", "sentimento", *config.FLAGS, "observacao"]
 
 def criar_template_rotulos(amostra: pd.DataFrame, posts: pd.DataFrame, saida) -> pd.DataFrame:
     """Cria CSV vazio para um anotador. Mostra só id e texto (nunca LLM nem rótulo do parceiro)."""
-    m = amostra[["id"]].merge(posts[["id", "texto"]], on="id", how="left")
+    am = amostra.copy()
+    am["id"] = am["id"].astype(str)
+    po = posts.copy()
+    po["id"] = po["id"].astype(str)
+    m = am[["id"]].merge(po[["id", "texto"]], on="id", how="left")
     tpl = m.copy()
     tpl["sentimento"] = ""
     for f in config.FLAGS:
@@ -64,26 +68,35 @@ def consolidar_consenso(ra: pd.DataFrame, rb: pd.DataFrame, decisoes: pd.DataFra
     """Gabarito consolidado.
     Onde A e B concordam: mantém. Onde divergem: usa `decisoes` (id, sentimento, flags) acordadas na discussão.
     Divergências sem decisão geram erro — a dupla tem de resolver todas (a ordem existe para não ancorar no LLM)."""
+    ra = ra.copy()
+    rb = rb.copy()
+    ra["id"] = ra["id"].astype(str)
+    rb["id"] = rb["id"].astype(str)
     m = ra.merge(rb, on="id", suffixes=("_A", "_B"))
     linhas = []
     pend = []
-    dec = decisoes.set_index("id") if decisoes is not None else pd.DataFrame()
+    if decisoes is not None:
+        dec = decisoes.copy()
+        dec["id"] = dec["id"].astype(str)
+        dec = dec.set_index("id")
+    else:
+        dec = pd.DataFrame()
     for _, r in m.iterrows():
-        linha = {"id": r["id"]}
+        linha = {"id": str(r["id"])}
         divergiu = r["sentimento_A"] != r["sentimento_B"] or any(r[f"{f}_A"] != r[f"{f}_B"] for f in config.FLAGS)
         if not divergiu:
             linha["sentimento"] = r["sentimento_A"]
             for f in config.FLAGS:
                 linha[f] = r[f"{f}_A"]
             linha["origem"] = "concordancia"
-        elif r["id"] in dec.index:
-            d = dec.loc[r["id"]]
+        elif str(r["id"]) in dec.index:
+            d = dec.loc[str(r["id"])]
             linha["sentimento"] = d["sentimento"]
             for f in config.FLAGS:
                 linha[f] = d[f] if f in d.index else r[f"{f}_A"]
             linha["origem"] = "discussao"
         else:
-            pend.append(r["id"])
+            pend.append(str(r["id"]))
             continue
         linhas.append(linha)
     if pend:
@@ -93,6 +106,7 @@ def consolidar_consenso(ra: pd.DataFrame, rb: pd.DataFrame, decisoes: pd.DataFra
 
 def ler_rotulos(caminho) -> pd.DataFrame:
     df = pd.read_csv(caminho)
+    df["id"] = df["id"].astype(str)
     for f in config.FLAGS:
         if f in df.columns:
             df[f] = df[f].fillna(0).astype(int)

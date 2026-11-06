@@ -61,3 +61,14 @@ def test_ajuste_por_matriz():
     adj = c.ajustar_por_matriz(s, cm)
     # coluna llm_positivo: max na linha hum_positivo(9)? colunas: negativo=[8,1,0], neutro=[2,3,1], positivo=[0,6,9]
     assert list(adj) == ["positivo", "neutro", "negativo"]
+
+
+def test_tabela_kappas_inclui_acuracia_e_contagem_ironia():
+    m = _m()
+    tab = c.tabela_kappas({"v1": m})
+    assert "acuracia_com_ironia" in tab.columns
+    assert "n_com_ironia" in tab.columns
+    assert "acuracia_sem_ironia" in tab.columns
+    assert "n_sem_ironia" in tab.columns
+    assert tab.loc[0, "n_com_ironia"] == 1
+    assert tab.loc[0, "n_sem_ironia"] == 5

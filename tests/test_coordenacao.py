@@ -68,3 +68,19 @@ def test_clusters_identicos_sao_unificados():
     chaves = cl["ids"].map(lambda x: tuple(sorted(x)))
     assert chaves.is_unique
     assert "similaridade" in cl.iloc[0]["tipo"] and "rajada" in cl.iloc[0]["tipo"]
+
+
+def test_historico_autor_sem_olhar_o_futuro():
+    # Autor publica no instante T1 (sem posts anteriores) e depois publica 10 posts em T2.
+    # Em T1, deve ter 0 posts anteriores (não 11!).
+    t1 = pd.Timestamp("2026-03-02 10:00:00", tz="America/Sao_Paulo")
+    linhas = [{"id": "p0", "data_hora": t1, "autor_id": "userX", "plataforma": "x", "texto": "PETR4 bom"}]
+    for i in range(1, 11):
+        linhas.append({"id": f"p{i}", "data_hora": t1 + pd.Timedelta(days=i), "autor_id": "userX", "plataforma": "x", "texto": f"PETR4 {i}"})
+    df = limpeza.limpar_posts(pd.DataFrame(linhas))
+    hist = co.historico_autores(df)
+    # Antes de T1: 0 posts
+    assert co.contar_posts_anteriores("userX", t1, hist) == 0
+    # No meio do caminho (após 3 dias): exatamente 3 posts
+    t_meio = t1 + pd.Timedelta(days=3, hours=1)
+    assert co.contar_posts_anteriores("userX", t_meio, hist) == 4

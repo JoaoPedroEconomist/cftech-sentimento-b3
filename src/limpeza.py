@@ -1,12 +1,17 @@
 """Etapa 03.1 — limpeza da base de posts e extração de tickers."""
 from __future__ import annotations
 
+import logging
 import re
 import unicodedata
 
 import pandas as pd
 
 from . import config
+
+logger = logging.getLogger("limpeza")
+if not logger.handlers:
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 
 def sem_acento(s: str) -> str:
@@ -32,10 +37,14 @@ def carregar_posts(caminho=None) -> pd.DataFrame:
 
 
 def padronizar_fuso(serie: pd.Series, tz_origem: str = "UTC") -> pd.Series:
-    """Converte para America/Sao_Paulo. Se o timestamp não tiver fuso, assume `tz_origem`."""
+    """Converte para America/Sao_Paulo. Se o timestamp não tiver fuso, assume `tz_origem` e registra no log."""
     s = pd.to_datetime(serie, errors="coerce")
-    if s.dt.tz is None:
+    tz_detectado = getattr(s.dt, "tz", None)
+    if tz_detectado is None:
+        logger.info(f"Fuso horário não especificado na base de origem. Assumindo '{tz_origem}' e convertendo para '{config.TZ_LOCAL}'.")
         s = s.dt.tz_localize(tz_origem)
+    else:
+        logger.info(f"Fuso horário detectado na base: '{tz_detectado}'. Convertendo para '{config.TZ_LOCAL}'.")
     return s.dt.tz_convert(config.TZ_LOCAL)
 
 
@@ -47,22 +56,54 @@ def normalizar_texto(t: str) -> str:
     return t
 
 
+def normalizar_ticker(t: str) -> str:
+    """Normaliza ticker para maiúsculas e converte fracionário (ex: petr4 -> PETR4, PETR4F/petr4f -> PETR4)."""
+    t = t.upper().strip()
+    # Tickers fracionários B3 possuem 'F' no final de ações ordinárias/preferenciais (ex: PETR4F -> PETR4)
+    if len(t) >= 6 and t.endswith("F") and t[-2].isdigit() and t[:4].isalpha():
+        return t[:-1]
+    return t
+
+
 def extrair_tickers_regex(texto: str) -> list[str]:
     achados = re.findall(config.REGEX_TICKER, str(texto))
-    return sorted({t for t in achados if t not in config.STOPLIST_TICKERS})
+    normalizados = {normalizar_ticker(t) for t in achados}
+    return sorted({t for t in normalizados if t not in config.STOPLIST_TICKERS})
+
+
+# Expressões idiomáticas com o verbo valer que NÃO representam a empresa Vale S.A.
+EXPRESSOES_VERBO_VALER = (
+    r"\b(vale\s+a\s+pena|"
+    r"nao\s+vale(\s+a\s+pena)?|"
+    r"quanto\s+vale|"
+    r"mais\s+vale|"
+    r"vale\s+(lembrar|ressaltar|destacar|notar|dizer|mencionar|tudo|o\s+risco))\b"
+)
 
 
 def extrair_tickers_nome(texto: str) -> list[str]:
-    """Menções por nome da empresa. Nomes ambíguos (ex.: 'vale') exigem contexto financeiro."""
+    """Menções por nome da empresa. Nomes ambíguos (ex.: 'vale') exigem contexto financeiro e excluem expressões comuns."""
     t = sem_acento(str(texto)).lower()
-    palavras = set(re.findall(r"\w+", t))
-    tem_contexto = bool(palavras & config.PALAVRAS_CONTEXTO_FINANCEIRO)
     achados = set()
+
     for nome, ticker in config.NOMES_EMPRESAS.items():
-        if re.search(rf"\b{re.escape(nome)}\b", t):
-            if nome in config.NOMES_AMBIGUOS and not tem_contexto:
+        if nome == "vale":
+            # Remove expressões idiomáticas do verbo valer ("vale a pena", etc.)
+            t_vale = re.sub(EXPRESSOES_VERBO_VALER, " ", t)
+            if not re.search(r"\bvale\b", t_vale):
+                continue
+            palavras = set(re.findall(r"\w+", t_vale))
+            if not (palavras & config.PALAVRAS_CONTEXTO_FINANCEIRO):
                 continue
             achados.add(ticker)
+        else:
+            if re.search(rf"\b{re.escape(nome)}\b", t):
+                if nome in config.NOMES_AMBIGUOS:
+                    palavras = set(re.findall(r"\w+", t))
+                    if not (palavras & config.PALAVRAS_CONTEXTO_FINANCEIRO):
+                        continue
+                achados.add(ticker)
+
     return sorted(achados)
 
 
@@ -74,6 +115,9 @@ def limpar_posts(df: pd.DataFrame, tz_origem: str = "UTC") -> pd.DataFrame:
     """Pipeline de limpeza: fuso, nulos, duplicatas exatas, tickers, tamanho do texto."""
     out = df.copy()
     n0 = len(out)
+    out["id"] = out["id"].astype(str)
+    if "autor_id" in out.columns:
+        out["autor_id"] = out["autor_id"].astype(str)
     out["data_hora"] = padronizar_fuso(out["data_hora"], tz_origem)
     out = out.dropna(subset=["id", "data_hora", "texto"])
     out["texto"] = out["texto"].astype(str).str.strip()

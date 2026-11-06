@@ -9,11 +9,12 @@
 
 ## Variáveis
 - `indice = (pos − neg) / total` por ticker-dia (mínimo de `N_MIN_POSTS=3` posts; ver `config.py`).
+- **Unidade amostral do sinal principal:** exclusivamente posts com um único ticker (`n_tickers == 1`), evitando contaminação de sentimento entre empresas distintas citadas no mesmo texto.
 - `volume_posts` = log(1 + nº de posts).
-- `ret_t+1`, `ret_acum_t+1_t+5` (retorno logarítmico do fechamento ajustado).
-- `vol_anormal_t+1` = log(volume) − média móvel de 20 pregões anteriores (janela deslizante sem olhar o futuro).
-- **Controles:** `ret_t` (retorno do dia do sinal), `ret_t-1`, `log_volume_posts` (em H1/H2).
-- Posts após 17:00 (BRT) ou em dia sem pregão → atribuídos ao próximo pregão.
+- `ret_excesso_t+1`, `ret_excesso_acum_t+1_t+5` (**retorno em excesso descontando o Ibovespa**, `ret_ativo - ret_ibov`, em log do fechamento ajustado). Elimina choques e movimentos macroeconômicos comuns de mercado.
+- `vol_anormal_t+1` = log(volume) − média móvel de 20 pregões anteriores (janela deslizante sem olhar o futuro, baixando preços 40 dias antes do primeiro post).
+- **Controles:** `ret_excesso_t` (retorno do dia do sinal), `ret_excesso_t-1`, `log_volume_posts` (em H1/H2).
+- **Horário de corte dinâmico:** posts após o fechamento regular da B3 (17:00 ou 18:00 BRT, ajustado dinamicamente conforme o calendário de sincronização com o horário de verão dos EUA) ou em finais de semana/feriados → atribuídos ao próximo pregão.
 
 ## Especificação (única, fixa)
 Para cada versão do sinal e cada variável dependente (3 DV):

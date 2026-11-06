@@ -147,3 +147,33 @@ def test_controle_constante_nao_quebra():
     tab = pr.rodar_testes({"v": p}, dvs=["ret_f1"], incluir_placebo=False)
     r = tab[(tab.modelo == "controles")].iloc[0]
     assert np.isfinite(r["p"]) and np.isfinite(r["ep"])
+
+
+def test_horario_corte_b3_dinamico():
+    # Inverno nos EUA (março antes do 2º domingo) -> 17h
+    assert mercado.obter_hora_corte_b3(pd.Timestamp("2026-03-04")) == 17
+    # Verão nos EUA (DST ativo: meados de março a out/nov) -> 18h
+    assert mercado.obter_hora_corte_b3(pd.Timestamp("2026-03-15")) == 18
+    assert mercado.obter_hora_corte_b3(pd.Timestamp("2026-06-15")) == 18
+
+    # Post em dia de horário estendido às 17h30 pertence ao pregão do próprio dia
+    cal = pd.DatetimeIndex(pd.bdate_range("2026-03-16", "2026-03-20"))
+    ts_mesmo_dia = _ts("2026-03-16 17:30")
+    assert pr.atribuir_pregao(ts_mesmo_dia, cal, hora_corte="dinamico").iloc[0] == pd.Timestamp("2026-03-16")
+    # Post após 18h vai para o pregão seguinte
+    ts_proximo_dia = _ts("2026-03-16 18:05")
+    assert pr.atribuir_pregao(ts_proximo_dia, cal, hora_corte="dinamico").iloc[0] == pd.Timestamp("2026-03-17")
+
+
+def test_mercado_retorno_em_excesso_ibovespa():
+    datas = pd.bdate_range("2026-01-01", periods=20)
+    preco_ativo = 100 * np.exp(np.arange(20) * 0.03)  # +3% ao dia
+    preco_ibov = 1000 * np.exp(np.arange(20) * 0.01)   # +1% ao dia
+    p_ativo = pd.DataFrame({"ticker": "VALE3", "data": datas, "close": preco_ativo, "adj_close": preco_ativo, "volume": np.full(20, 1000.0)})
+    p_ibov = pd.DataFrame({"data": datas, "close": preco_ibov, "adj_close": preco_ibov, "volume": np.full(20, 50000.0)})
+
+    painel = mercado.construir_painel_mercado(p_ativo, ibov=p_ibov).set_index("data")
+    # Retorno bruto = 3%, retorno Ibov = 1%, retorno em excesso = 2%
+    assert painel.loc[datas[5], "ret_t"] == pytest.approx(0.03, abs=1e-5)
+    assert painel.loc[datas[5], "ret_excesso_t"] == pytest.approx(0.02, abs=1e-5)
+    assert painel.loc[datas[5], "ret_excesso_f1"] == pytest.approx(0.02, abs=1e-5)

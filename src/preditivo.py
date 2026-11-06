@@ -12,19 +12,22 @@ import pandas as pd
 import statsmodels.formula.api as smf
 from statsmodels.stats.multitest import multipletests
 
-from . import config
+from . import config, mercado
 
-DVS_PRINCIPAIS = ["ret_f1", "ret_acum_f1_f5", "vol_anormal_f1"]
-DV_PLACEBO = "ret_lag1"  # o índice de t não pode "prever" o retorno passado; se prever, é causalidade invertida
+DVS_PRINCIPAIS = ["ret_excesso_f1", "ret_excesso_acum_f1_f5", "vol_anormal_f1"]
+DVS_LEGADO = ["ret_f1", "ret_acum_f1_f5", "vol_anormal_f1"]
+DV_PLACEBO = "ret_excesso_lag1"
+DV_PLACEBO_LEGADO = "ret_lag1"
 
 
 # ---------- alinhamento de horário ----------
-def atribuir_pregao(data_hora: pd.Series, calendario: pd.DatetimeIndex, hora_corte: int = config.HORA_CORTE) -> pd.Series:
+def atribuir_pregao(data_hora: pd.Series, calendario: pd.DatetimeIndex, hora_corte: int | str = "dinamico") -> pd.Series:
     """Mapeia cada timestamp (tz-aware, America/Sao_Paulo) ao pregão ao qual o post "pertence".
 
     - post em dia de pregão antes do corte  -> esse pregão;
     - post após o corte, fim de semana ou feriado -> próximo pregão disponível;
     - post depois do último pregão do calendário -> NaT (descartado).
+    - hora_corte: 'dinamico' consulta o horário sazonal de fechamento da B3 (17h ou 18h).
     """
     dh = pd.to_datetime(data_hora)
     if dh.dt.tz is None:
@@ -32,7 +35,13 @@ def atribuir_pregao(data_hora: pd.Series, calendario: pd.DatetimeIndex, hora_cor
     else:
         dh = dh.dt.tz_convert(config.TZ_LOCAL)
     dia = dh.dt.tz_localize(None).dt.normalize()
-    apos_corte = dh.dt.hour >= hora_corte
+
+    if hora_corte == "dinamico" or hora_corte is None:
+        cortes = dia.map(mercado.obter_hora_corte_b3)
+        apos_corte = dh.dt.hour >= cortes
+    else:
+        apos_corte = dh.dt.hour >= int(hora_corte)
+
     dia_ref = dia + pd.to_timedelta(apos_corte.astype(int), unit="D")
     cal = pd.DatetimeIndex(calendario).sort_values()
     pos = cal.searchsorted(dia_ref.to_numpy(), side="left")  # primeiro pregão >= dia_ref
@@ -46,7 +55,7 @@ def atribuir_pregao(data_hora: pd.Series, calendario: pd.DatetimeIndex, hora_cor
 def indice_diario(
     posts_sent: pd.DataFrame,
     calendario: pd.DatetimeIndex,
-    hora_corte: int = config.HORA_CORTE,
+    hora_corte: int | str = "dinamico",
     n_min: int = config.N_MIN_POSTS,
     um_voto_por_autor: bool = False,
     excluir_ids: set[str] | None = None,
@@ -56,8 +65,10 @@ def indice_diario(
     indice = (pos − neg) / total, por ticker e pregão. `um_voto_por_autor` limita cada autor a 1 voto por
     ticker-dia (robustez a contas hiperativas; Liu & Son, 2024). `excluir_ids` remove posts coordenados."""
     d = posts_sent.copy()
+    d["id"] = d["id"].astype(str)
     if excluir_ids:
-        d = d[~d["id"].astype(str).isin(excluir_ids)]
+        ids_excluir = {str(i) for i in excluir_ids}
+        d = d[~d["id"].isin(ids_excluir)]
     d["pregao"] = atribuir_pregao(d["data_hora"], calendario, hora_corte)
     d = d.dropna(subset=["pregao", "sentimento"])
     d["v"] = d["sentimento"].map({"positivo": 1, "negativo": -1, "neutro": 0})
@@ -97,8 +108,10 @@ def controles_para(dv: str) -> list[str]:
     """Controles do modelo 'com controles' (docs/plano_de_testes.md)."""
     if dv == "vol_anormal_f1":
         return ["vol_anormal_t", "log_volume_posts"]
-    if dv == DV_PLACEBO:
+    if dv in (DV_PLACEBO, DV_PLACEBO_LEGADO):
         return ["log_volume_posts"]  # no placebo NÃO controlamos o retorno passado: é a própria variável testada
+    if "excesso" in dv:
+        return ["ret_excesso_t", "ret_excesso_lag1", "log_volume_posts"]
     return ["ret_t", "ret_lag1", "log_volume_posts"]
 
 
@@ -133,8 +146,19 @@ def rodar_testes(
 ) -> pd.DataFrame:
     """Roda a especificação fixa do plano: versões × DVs × {base, controles}.
     Aplica Holm aos testes da família principal (modelo 'controles' em DVs principais)."""
-    dvs = list(dvs or DVS_PRINCIPAIS)
-    alvo = dvs + ([DV_PLACEBO] if incluir_placebo else [])
+    if dvs is None:
+        primeiro_painel = next(iter(paineis.values())) if paineis else pd.DataFrame()
+        if not primeiro_painel.empty and "ret_excesso_f1" in primeiro_painel.columns:
+            dvs = list(DVS_PRINCIPAIS)
+            placebo = DV_PLACEBO
+        else:
+            dvs = list(DVS_LEGADO)
+            placebo = DV_PLACEBO_LEGADO
+    else:
+        dvs = list(dvs)
+        placebo = DV_PLACEBO if any("excesso" in str(d) for d in dvs) else DV_PLACEBO_LEGADO
+
+    alvo = dvs + ([placebo] if incluir_placebo else [])
     linhas = []
     for versao, painel in paineis.items():
         for dv in alvo:

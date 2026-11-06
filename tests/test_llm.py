@@ -50,6 +50,17 @@ def test_cache_evita_chamada_repetida():
     assert info2["em_cache"] == 5
 
 
+def test_cache_chave_composta_id_e_texto():
+    # Se dois posts têm o mesmo id mas textos diferentes (ex: post de teste vs real), o cache não colide
+    posts1 = pd.DataFrame({"id": ["1"], "texto": ["PETR4 lucro recorde"]})
+    posts2 = pd.DataFrame({"id": ["1"], "texto": ["VALE3 despencou prejuízo"]})
+    c = {"n": 0}
+    out1, _ = llm.classificar(posts1, "v1", chamar=_fake_cliente(c))
+    assert c["n"] == 1
+    out2, _ = llm.classificar(posts2, "v1", chamar=_fake_cliente(c))
+    assert c["n"] == 2  # chamou novamente porque o texto do post mudou
+
+
 def test_retry_em_json_invalido():
     posts = pd.DataFrame({"id": ["1"], "texto": ["x"]})
     estado = {"n": 0}

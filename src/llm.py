@@ -108,18 +108,30 @@ def estimar_tokens(texto: str) -> int:
 
 
 # ---------- cache em disco ----------
+def _gerar_chave_cache(post_id: str | int, texto: str) -> str:
+    """Gera chave composta id + hash do texto do post para evitar colisão entre posts reais e de teste."""
+    h_txt = hashlib.sha256(str(texto).strip().encode("utf-8")).hexdigest()[:12]
+    return f"{str(post_id)}_{h_txt}"
+
+
 def _cache_path(versao: str, hash_prompt: str, modelo: str) -> Path:
     config.DATA_CACHE.mkdir(parents=True, exist_ok=True)
     return config.DATA_CACHE / f"cache_{versao}_{hash_prompt}_{modelo}.jsonl"
 
 
 def ler_cache(path: Path) -> dict[str, dict]:
+    """Lê o cache em disco indexado pela chave composta id + hash do texto."""
     if not path.exists():
         return {}
     out = {}
     for linha in path.read_text(encoding="utf-8").splitlines():
         if linha.strip():
             d = json.loads(linha)
+            # Se já possui chave_cache explícita
+            if "chave_cache" in d:
+                out[d["chave_cache"]] = d
+            elif "texto" in d:
+                out[_gerar_chave_cache(d["id"], d["texto"])] = d
             out[str(d["id"])] = d
     return out
 
@@ -151,7 +163,7 @@ def chamar_anthropic(system: str, user: str, modelo: str, max_tokens: int = 2048
 
 
 def chamar_gemini(system: str, user: str, modelo: str, max_tokens: int = 2048):
-    """Retorna (texto, tokens_in, tokens_out). Chama Gemini via google.genai Interactions API."""
+    """Retorna (texto, tokens_in, tokens_out). Chama Gemini com temperatura 0 estrita via generation_config."""
     from google import genai
 
     api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
@@ -160,6 +172,7 @@ def chamar_gemini(system: str, user: str, modelo: str, max_tokens: int = 2048):
     interaction = client.interactions.create(
         model=modelo,
         input=prompt,
+        generation_config={"temperature": 0.0, "max_output_tokens": max_tokens},
     )
     texto = interaction.output_text or ""
     tin, tout = 0, 0
@@ -206,7 +219,12 @@ def classificar(
     cache = ler_cache(cache_p)
     custo = Custo(_float_env("LLM_PRICE_IN_PER_MTOK"), _float_env("LLM_PRICE_OUT_PER_MTOK"), _float_env("LLM_BUDGET_USD"))
 
-    pendentes = [r for r in posts[["id", "texto"]].to_dict("records") if str(r["id"]) not in cache]
+    posts_records = [{"id": str(r["id"]), "texto": str(r["texto"])} for r in posts[["id", "texto"]].to_dict("records")]
+    for r in posts_records:
+        r["_chave"] = _gerar_chave_cache(r["id"], r["texto"])
+
+    # A chave do cache é estritamente composta por id + hash(texto) para evitar reutilização indevida
+    pendentes = [r for r in posts_records if r["_chave"] not in cache]
     info = {"versao": versao, "hash_prompt": h, "modelo": modelo, "total": len(posts), "em_cache": len(posts) - len(pendentes), "chamadas": 0, "falhas": []}
 
     if dry_run:
@@ -217,6 +235,7 @@ def classificar(
     for i in range(0, len(pendentes), batch):
         lote = pendentes[i : i + batch]
         ids_lote = {str(p["id"]) for p in lote}
+        texto_por_id = {str(p["id"]): str(p["texto"]) for p in lote}
         user = montar_user(user_tpl, lote)
         ok = False
         for tent in range(1, config.LLM_MAX_RETRIES + 1):
@@ -228,12 +247,23 @@ def classificar(
                 recebidos = {r.id for r in res}
                 if recebidos != ids_lote:
                     raise ValueError(f"ids divergentes: faltam {len(ids_lote - recebidos)}, sobram {len(recebidos - ids_lote)}")
-                linhas = [
-                    {**r.model_dump(), "versao_prompt": versao, "hash_prompt": h, "modelo": modelo, "resposta_bruta_hash": hashlib.md5(texto.encode()).hexdigest()[:8]}
-                    for r in res
-                ]
+                linhas = []
+                for r in res:
+                    txt_p = texto_por_id.get(r.id, "")
+                    ch = _gerar_chave_cache(r.id, txt_p)
+                    linha_d = {
+                        **r.model_dump(),
+                        "chave_cache": ch,
+                        "texto_hash": hashlib.sha256(txt_p.strip().encode()).hexdigest()[:12],
+                        "versao_prompt": versao,
+                        "hash_prompt": h,
+                        "modelo": modelo,
+                        "resposta_bruta_hash": hashlib.md5(texto.encode()).hexdigest()[:8],
+                    }
+                    linhas.append(linha_d)
+                    cache[ch] = linha_d
+                    cache[r.id] = linha_d
                 gravar_cache(cache_p, linhas)
-                cache.update({r["id"]: r for r in linhas})
                 ok = True
                 break
             except RuntimeError:
@@ -250,16 +280,31 @@ def classificar(
                     texto, tin, tout = chamar(system, montar_user(user_tpl, [p]), modelo)
                     custo.somar(tin, tout)
                     res = parse_resposta(texto)
-                    linhas = [{**r.model_dump(), "versao_prompt": versao, "hash_prompt": h, "modelo": modelo, "resposta_bruta_hash": ""} for r in res if r.id == str(p["id"])]
+                    linhas = []
+                    for r in res:
+                        if r.id == str(p["id"]):
+                            ch = _gerar_chave_cache(r.id, p["texto"])
+                            linha_d = {
+                                **r.model_dump(),
+                                "chave_cache": ch,
+                                "texto_hash": hashlib.sha256(str(p["texto"]).strip().encode()).hexdigest()[:12],
+                                "versao_prompt": versao,
+                                "hash_prompt": h,
+                                "modelo": modelo,
+                                "resposta_bruta_hash": "",
+                            }
+                            linhas.append(linha_d)
+                            cache[ch] = linha_d
+                            cache[r.id] = linha_d
                     gravar_cache(cache_p, linhas)
-                    cache.update({r["id"]: r for r in linhas})
                 except RuntimeError:
                     raise
                 except Exception:  # noqa: BLE001
                     pass
 
     info.update(custo.resumo())
-    saida = pd.DataFrame([cache[str(i)] for i in posts["id"].astype(str) if str(i) in cache])
+    saida_linhas = [cache[r["_chave"]] for r in posts_records if r["_chave"] in cache]
+    saida = pd.DataFrame(saida_linhas)
     info["sem_resultado"] = len(posts) - len(saida)
     return saida, info
 

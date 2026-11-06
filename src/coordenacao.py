@@ -27,9 +27,34 @@ def urgencia_alvo(texto: str) -> bool:
     return bool(re.search(config.URGENCIA_REGEX, sem_acento(str(texto)).lower()))
 
 
-def historico_autores(posts: pd.DataFrame) -> pd.Series:
-    """Nº de posts de cada autor na base inteira (proxy de histórico; autores 'novos' têm poucos posts)."""
-    return posts["autor_id"].value_counts()
+def historico_autores(posts: pd.DataFrame) -> dict[str, pd.DatetimeIndex]:
+    """Mapeia cada autor para os timestamps ordenados dos seus posts (para contagem sem olhar o futuro)."""
+    p = posts.sort_values("data_hora")
+    return {str(a): pd.DatetimeIndex(g["data_hora"]) for a, g in p.groupby("autor_id")}
+
+
+def contar_posts_anteriores(autor: str, t_ref: pd.Timestamp, historico: dict[str, pd.DatetimeIndex] | pd.Series) -> int:
+    """Conta estritamente os posts do autor publicados antes de t_ref (sem lookahead bias)."""
+    if isinstance(historico, dict):
+        idx = historico.get(str(autor))
+        if idx is None or len(idx) == 0:
+            return 0
+        t_alvo = pd.to_datetime(t_ref)
+        if idx.tz is not None and t_alvo.tz is None:
+            t_alvo = t_alvo.tz_localize(idx.tz)
+        elif idx.tz is None and t_alvo.tz is not None:
+            t_alvo = t_alvo.tz_localize(None)
+        return int(idx.searchsorted(t_alvo, side="left"))
+    return int(historico.get(autor, 0))
+
+
+def taxa_normal_ticker(ex: pd.DataFrame) -> dict[str, float]:
+    """Calcula a taxa média normal de posts por hora de cada ticker na base."""
+    taxas = {}
+    for t, g in ex.groupby("ticker"):
+        span_h = max(0.5, (g["data_hora"].max() - g["data_hora"].min()).total_seconds() / 3600)
+        taxas[t] = len(g) / span_h
+    return taxas
 
 
 # ---------- clusters ----------
@@ -87,9 +112,10 @@ def pontuar_clusters(
     clusters: pd.DataFrame,
     ex: pd.DataFrame,
     X,
-    historico: pd.Series,
+    historico: dict[str, np.ndarray] | pd.Series,
     liquidez: pd.Series | None = None,
     pesos: dict | None = None,
+    taxas_tickers: dict[str, float] | None = None,
 ) -> pd.DataFrame:
     """Calcula as componentes e o escore (média ponderada; pesos renormalizados se faltar liquidez)."""
     pesos = dict(pesos or config.PESOS_SUSPEITA)
@@ -114,14 +140,24 @@ def pontuar_clusters(
         norm = np.linalg.norm(cen)
         sim = float((Xm @ cen / norm).mean()) if norm > 0 else 0.0
 
-        # rajada: muitos autores em pouco tempo
-        raj = min(1.0, n_aut / (2 * config.MIN_AUTORES_RAJADA))
+        # rajada: muitos autores em pouco tempo, comparada com o movimento normal do ticker
+        raj_autores = min(1.0, n_aut / (2 * config.MIN_AUTORES_RAJADA))
         if span_min > config.JANELA_RAJADA_MIN:
-            raj *= config.JANELA_RAJADA_MIN / span_min
+            raj_autores *= config.JANELA_RAJADA_MIN / span_min
 
-        # autores com pouco histórico
+        if taxas_tickers and c["ticker"] in taxas_tickers:
+            taxa_base = max(taxas_tickers[c["ticker"]], 0.05)
+            span_h = max(span_min / 60.0, 5.0 / 60.0)  # mínimo de 5 minutos
+            taxa_cluster = len(sub) / span_h
+            ratio_anomalia = taxa_cluster / taxa_base
+            raj_anomalia = min(1.0, ratio_anomalia / 4.0)
+            raj = 0.5 * raj_autores + 0.5 * raj_anomalia
+        else:
+            raj = raj_autores
+
+        # autores com pouco histórico (conta estritamente os posts ANTERIORES ao cluster)
         autores = sub["autor_id"].unique()
-        novo = float(np.mean([historico.get(a, 0) < config.MIN_POSTS_AUTOR_HISTORICO for a in autores]))
+        novo = float(np.mean([contar_posts_anteriores(a, t_ini, historico) < config.MIN_POSTS_AUTOR_HISTORICO for a in autores]))
 
         # baixa liquidez
         baixa = float(1 - liq_pct.get(c["ticker"], 0.5)) if liq_pct is not None else np.nan
@@ -175,7 +211,8 @@ def detectar(posts: pd.DataFrame, liquidez: pd.Series | None = None) -> tuple[pd
     if cl.empty:
         return pd.DataFrame(), pd.DataFrame(columns=["id", "cluster_id"])
     hist = historico_autores(posts)
-    pont = pontuar_clusters(cl, ex, X, hist, liquidez)
+    taxas = taxa_normal_ticker(ex)
+    pont = pontuar_clusters(cl, ex, X, hist, liquidez, taxas_tickers=taxas)
     mapa = pont[["cluster_id", "ids"]].explode("ids").rename(columns={"ids": "id"})[["id", "cluster_id"]]
     return pont, mapa
 

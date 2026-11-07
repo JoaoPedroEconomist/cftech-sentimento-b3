@@ -109,5 +109,6 @@ def ler_rotulos(caminho) -> pd.DataFrame:
     df["id"] = df["id"].astype(str)
     for f in config.FLAGS:
         if f in df.columns:
-            df[f] = df[f].fillna(0).astype(int)
+            # Converte valores contínuos (ex: 0.8) com limiar >= 0.5 para binário 0/1
+            df[f] = (df[f].fillna(0).astype(float) >= 0.5).astype(int)
     return df

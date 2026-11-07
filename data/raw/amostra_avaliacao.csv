@@ -1,0 +1,101 @@
+id,sentimento,ironia,giria_meme,suspeita_coordenacao,irrelevante,data,ativo,fonte,comentario_resumo,link
+1,negativo,0,0,0,0,2026-11-02,PETR4 (Petrobras PN),"Investing.com, fórum","""segunda abre em 43""",https://br.investing.com/equities/petrobras-pn-commentary
+2,positivo,0.2,0.5,0.1,0.1,2026-11-01,PETR4 (Petrobras PN),"Investing.com, fórum","""Bora encher o carrinho, black friday antecipada.""",https://br.investing.com/equities/petrobras-pn-commentary
+3,negativo,0,0,0,0,2026-11-04,PETR4 (Petrobras PN),"Investing.com, fórum","""Incrivel como cai facil""",https://br.investing.com/equities/petrobras-pn-commentary
+4,positivo,0,0,0,0,2026-11-05,PETR4 (Petrobras PN),"Investing.com, fórum","""Dia 11/11 será o Resultado do 3TR segundo casas de análice vem superrando e grande possibilide da divulgação do próximo dividendo.""",https://br.investing.com/equities/petrobras-pn-commentary
+5,negativo,0,0.2,0,0.3,2026-10-30,PETR4 (Petrobras PN),"Investing.com, fórum","""to querendo comprar umas puts no fim do pregão .. será wue Trump vai aprontar esse fds?""",https://br.investing.com/equities/petrobras-pn-commentary
+6,positivo,0,0.1,0.1,0,2026-11-05,PETR4/Petrobras e BBAS3/Banco do Brasil,"Investing.com, fórum PETR4","""Quem nao aproveitar e ir comprando petro e Bb vai se arrepender""",https://br.investing.com/equities/petrobras-pn-commentary
+7,neutro,0.3,0.1,0,0.7,2026-11-05,PETR4 (Petrobras PN),"Investing.com, fórum","""Ana,difícil os EUA atacar o Irã com uma arma nuclear. E caso isso aconteça,no dia seguinte ou The day after,as bolsas mundiais nem abrem.""",https://br.investing.com/equities/petrobras-pn-commentary
+8,neutro,0.4,0.3,0,0.7,2026-11-05,PETR4 (Petrobras PN),"Investing.com, fórum","""'Com todo respeito, vc ja perdeu boa grana né, pq só fala em queda a 3 meses kkk""",https://br.investing.com/equities/petrobras-pn-commentary
+9,positivo,0.2,0.5,0.05,0.1,~2026-11-03,PETR4,Reddit r/farialimabets,acha que a ação deve subir forte se os EUA atacarem o Irã,https://www.reddit.com/r/farialimabets/comments/1xmu8nx/petrobr%C3%A1s_derretendo_7_hoje/
+10,positivo,0.9,0.6,0.1,0.2,~2026-11-03,PETR4,Reddit r/farialimabets,manda vender tudo e trocar por Casas Bahia,
+11,negativo,0.9,0.4,0.1,0.5,~2026-11-03,XP (corretora),Reddit r/farialimabets,ironiza assessor da XP que mandaria vender a casa para comprar OIBR3,
+12,neutro,0.9,0.5,0.1,0.3,~2026-11-03,PETR4,Reddit r/farialimabets,sugere compor com MGLU3 e diz 'muito melhor que PETR4',
+13,neutro,0.1,0.1,0.05,0.1,~2026-11-03,PETR4,Reddit r/farialimabets,explica a queda pelo petróleo mais barato na semana,https://www.reddit.com/r/farialimabets/comments/1xmu8nx/petrobr%C3%A1s_derretendo_7_hoje/
+14,positivo,0.3,0.9,0.1,0.1,~2026-11-03,PETR4,Reddit r/farialimabets,"acha que o 'TACO' vai se repetir e a expectativa de acordo EUA-Irã vai desmanchar, levando petróleo e ação de volta para cima",https://www.reddit.com/r/farialimabets/comments/1xmu8nx/petrobr%C3%A1s_derretendo_7_hoje/
+15,neutro,0.8,0.3,0.1,0.3,~2026-11-03,PETR4,Reddit r/farialimabets,diz com sarcasmo que Trump já está resolvendo o preço das ações,https://www.reddit.com/r/farialimabets/comments/1xmu8nx/petrobr%C3%A1s_derretendo_7_hoje/
+16,positivo,0.4,0.4,0.05,0.1,~2026-11-03,PETR4,Reddit r/farialimabets,debocha da venda por pânico e diz que compra de quem vende,https://www.reddit.com/r/farialimabets/comments/1xmu8nx/petrobr%C3%A1s_derretendo_7_hoje/
+17,positivo,0.9,0.5,0.1,0.1,~2026-11-03,PETR4,Reddit r/farialimabets,"grita 'venda tudo, desespero e pânico' em tom de deboche",
+18,positivo,0.4,0.6,0.05,0.1,~2026-11-03,PETR4,Reddit r/farialimabets,"chama a queda de 7% de 'Black Friday mais cedo', ou seja, vê desconto",https://www.reddit.com/r/farialimabets/comments/1xmu8nx/petrobr%C3%A1s_derretendo_7_hoje/
+19,neutro,0.3,0.5,0.05,0.2,~2026-11-03,PETR4,Reddit r/farialimabets,vendeu toda a posição acima de R$50 (PM R$30) e brinca que 'traiu o sub',
+20,positivo,0.1,0.3,0.05,0.1,~2026-11-04,PETR4,Reddit r/farialimabets,"diz que comprou ontem, na queda",https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+21,neutro,0.8,0.5,0.05,0.3,~2026-11-04,PETR4,Reddit r/farialimabets,"resposta irônica: estava alto, começou a descer e agora está baixo",https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+22,neutro,0.9,0.4,0.05,0.9,~2026-11-04,PETR4,Reddit r/farialimabets,zoação com o autor do post ('voto para Ministro da Economia'),
+23,neutro,0.1,0.1,0.05,0.1,~2026-11-04,PETR4,Reddit r/farialimabets,atribui a queda do petróleo à maioria democrata nas midterms e ao fim esperado da guerra no Irã,https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+24,neutro,0.2,0.2,0.05,0.2,~2026-11-04,PETR4,Reddit r/farialimabets,concorda que a causa é o petróleo e diz que não tem relação com Lula,https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+25,neutro,0.8,0.9,0.05,0.95,~2026-11-04,PETR4,Reddit r/farialimabets,pede ao Grok para explicar o efeito no Grêmio,
+26,neutro,0.8,0.7,0.05,0.9,~2026-11-04,PETR4,Reddit r/farialimabets,"piada de que o Grêmio, no fundo da tabela, 'acha petróleo'",https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+27,neutro,0.4,0.3,0.05,0.6,~2026-11-04,PETR4,Reddit r/farialimabets,lamenta que muita gente mexa com ações sem entender economia e política global,https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+28,neutro,0.1,0.1,0.05,0.1,~2026-11-04,PETR4,Reddit r/farialimabets,diz que a ação segue o barril no curto prazo e liga a queda do petróleo à eleição nos EUA,https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+29,neutro,0.8,0.6,0.05,0.6,~2026-11-04,PETR4,Reddit r/farialimabets,ironiza quem pede racionalidade da bolsa no FariaLimaBets,https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+30,neutro,0.9,0.4,0.05,0.3,~2026-11-04,PETR4,Reddit r/farialimabets,explicação irônica: 'tem mais vendedor do que comprador',https://www.reddit.com/r/farialimabets/comments/1xnzonv/qual_a_racionalidade_por_detr%C3%A1s_do_derretimento/
+31,negativo,0.2,0.3,0.05,0.1,2026-11-03 em diante (sem timestamp por comentário),BBAS3,Reddit r/investimentos,vê risco por ser estatal e compara com os Correios,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+32,neutro,0.1,0.1,0.05,0.6,2026-11-03 em diante,BBAS3,Reddit r/investimentos,pede foco em critérios técnicos e não ideológicos,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+33,negativo,0.1,0.2,0.05,0.1,2026-11-03 em diante,BBAS3,Reddit r/investimentos,para renda na aposentadoria diz que o Itaú é muito melhor,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+34,neutro,0.1,0.1,0.05,0.4,2026-11-03 em diante,BBAS3,Reddit r/investimentos,defende que o preço de entrada sempre importa para quem quer dividendos,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+35,negativo,0.2,0.2,0.05,0.5,2026-11-03 em diante,BBAS3,Reddit r/investimentos,resposta curta: 'não invista no Brasil',https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+36,negativo,0.2,0.2,0.05,0.2,2026-11-03 em diante,BBAS3,Reddit r/investimentos,cita blackout de sistemas do banco e acha que a cotação pode ir abaixo de R$12,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+37,negativo,0,0.2,0.05,0.1,2026-11-03 em diante,BBAS3,Reddit r/investimentos,"diz que é mal gerido, perde espaço no agro e tem carteira degradada",
+38,negativo,0.1,0.4,0.05,0.1,2026-11-03 em diante,BBAS3,Reddit r/investimentos,chama de 'bomba' para aposentadoria,
+39,positivo,0.1,0.1,0.05,0.1,2026-11-03 em diante,BBAS3,Reddit r/investimentos,acha que não chega a R$12 e que volta ao valor pré-eleição em cerca de 2 meses,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+40,neutro,0.1,0.1,0.05,0.2,2026-11-03 em diante,BBAS3,Reddit r/investimentos,"acredita na recuperação, mas não usaria só isso como tese de aposentadoria",https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+41,positivo,0.1,0.1,0.05,0.1,2026-11-03 em diante,BBAS3,Reddit r/investimentos,"lucros bons, momento ruim por causa do agro, que vai se recuperar",https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+42,neutro,0.1,0.1,0.05,0.3,2026-11-03 em diante,BBAS3,Reddit r/investimentos,diz que é preciso ver quem será o novo presidente do banco,https://www.reddit.com/r/investimentos/comments/1xmwanf/o_que_voc%C3%AAs_acham_de_comprar_a%C3%A7%C3%B5es_do_banco_do/
+43,positivo,0.3,0.8,0.1,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,diz que comprou também e que a 'sardinhada' está segurando a queda,https://www.reddit.com/r/investimentos/comments/1xgbmtk/all_in_banco_do_brasil_bbas3/
+44,positivo,0.3,0.6,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,acha tão atraente que pensa em vender outros ativos para fazer swing em BBAS3,https://www.reddit.com/r/investimentos/comments/1xgbmtk/all_in_banco_do_brasil_bbas3/
+45,neutro,0.7,0.5,0.05,0.9,2026-10-26 em diante,BBAS3,Reddit r/investimentos,diz que vendeu tudo para comprar ONCO3,
+46,positivo,0,0.1,0.05,0.2,2026-10-26 em diante,BBAS3,Reddit r/investimentos,"pretende vender aos poucos conforme a cotação subir, respeitando o limite de isenção de IR",https://www.reddit.com/r/investimentos/comments/1xgbmtk/all_in_banco_do_brasil_bbas3/
+47,neutro,0.6,0.5,0.05,0.4,2026-10-26 em diante,BBAS3,Reddit r/investimentos,'bet com fundamentos': compara o all-in a aposta,https://www.reddit.com/r/investimentos/comments/1xgbmtk/all_in_banco_do_brasil_bbas3/
+48,neutro,0.8,0.4,0.05,0.4,2026-10-26 em diante,BBAS3,Reddit r/investimentos,ironiza com 'aposta bolsista' vindo dos criadores da aposta esportiva,https://www.reddit.com/r/investimentos/comments/1xgbmtk/all_in_banco_do_brasil_bbas3/
+49,neutro,0.7,0.7,0.05,0.7,2026-10-26 em diante,BBAS3,Reddit r/investimentos,manda o autor para r/farialimabets,
+50,positivo,0.1,0.3,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,"acha que a cotação volta ao preço de março, pois a queda é especulação",https://www.reddit.com/r/investimentos/comments/1xgbmtk/all_in_banco_do_brasil_bbas3/
+51,negativo,0.1,0.1,0.05,0.2,2026-10-26 em diante,BBAS3,Reddit r/investimentos,"prevê calote de exportadoras e prejuízo do BB, inclusive no Plano Safra",https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+52,positivo,0.2,0.3,0.05,0.1,2026-10-26 em diante,"BBAS3, PETR4",Reddit r/investimentos,'ação de graça': venderia renda fixa para comprar BB e Petrobras,https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+53,negativo,0.1,0.1,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,prefere Itaú ao BB e acha que o BB cai mais,https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+54,positivo,0,0.1,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,diz que a ação já teve 'comeback',https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+55,positivo,0.1,0.3,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,'hora de comprar',https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+56,positivo,0.2,0.4,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,diz que já comprou,https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+57,positivo,0.2,0.5,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,'hora de encher o carrinho',https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+58,positivo,0.1,0.2,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,vendeu tudo após o 1º turno e começou a recomprar,https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+59,negativo,0.2,0.5,0.05,0.1,2026-10-26 em diante,BBAS3,Reddit r/investimentos,prevê queda a R$12 ('pode printar'),https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+60,neutro,0.7,0.5,0.05,0.7,2026-10-26 em diante,BBAS3,Reddit r/investimentos,ironiza que Lula vai 'proibir o comércio internacional',
+61,neutro,0.3,0.5,0.05,0.4,2026-10-26 em diante,BBAS3,Reddit r/investimentos,'que inveja': reage a quem recomprou na queda,https://www.reddit.com/r/investimentos/comments/1xfxovm/banco_do_brasil_caiu_pra_caralho/
+62,positivo,0,0.1,0.05,0.2,~2026-10-26 a 2026-10-28,PETR4,Reddit r/investimentos,"sugere focar em poucas ações, como Petrobras e Itaú",https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+63,neutro,0,0.1,0.05,0.2,~2026-10-26 a 2026-10-28,"PETR4, VALE3",Reddit r/investimentos,diz que exigem experiência porque oscilam com o preço internacional,https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+64,neutro,0,0.1,0.05,0.4,~2026-10-26 a 2026-10-28,"Bancos (BBAS3, BBDC4 genérico)",Reddit r/investimentos,bancos sofrem com juro alto,
+65,negativo,0.8,0.6,0.05,0.5,~2026-10-26 a 2026-10-28,Bolsa em geral,Reddit r/investimentos,ironiza quem entrou forte agora e vai 'conhecer o Prof. Dr. Ferro',https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+66,neutro,0.7,0.5,0.05,0.9,~2026-10-26 a 2026-10-28,Sem ativo claro,Reddit r/investimentos,provocação política sobre a carteira,https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+67,positivo,0.1,0.1,0.05,0.5,~2026-10-26 a 2026-10-28,"Carteira (tickers na imagem, não visíveis)",Reddit r/investimentos,"'só empresas boas, então tá valendo'",https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+68,positivo,0,0.1,0.05,0.5,~2026-10-26 a 2026-10-28,"Carteira (tickers na imagem, não visíveis)",Reddit r/investimentos,elogia empresas sólidas em setores perenes,https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+69,negativo,0,0.1,0.05,0.5,~2026-10-26 a 2026-10-28,"Carteira (tickers na imagem, não visíveis)",Reddit r/investimentos,zero exposição internacional e moeda forte: 'altíssimo risco',https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+70,neutro,0.3,0.6,0.05,0.9,~2026-10-26 a 2026-10-28,Sem ativo claro,Reddit r/investimentos,piada: 'deixa um pouco de ação pra nós',https://www.reddit.com/r/investimentos/comments/1xgoniu/julgue_minha_carteira/
+71,negativo,0,0.1,0.05,0.6,2026-10-28 em diante,"PETR4, VALE3, BBDC4 (renda variável BR em geral)",Reddit r/investimentos,diz que 'ninguém bate o CDI',https://www.reddit.com/r/investimentos/comments/1xhfpuv/duvida_sincera_de_um_leigo/
+72,positivo,0,0.2,0.4,0.2,2026-10-28 em diante,"PETR4, VALE3, BBDC4",Reddit r/investimentos,"lista ganho real em proventos (PETR4 +11,3%, VALE3 +4,26%, BBDC4 +3,49%)",
+73,neutro,0.5,0.1,0.05,0.6,2026-10-28 em diante,Renda variável BR em geral,Reddit r/investimentos,afirma que 'RV no Brasil é sempre melhor' e prevê que vão inventar contra-argumentos,https://www.reddit.com/r/investimentos/comments/1xhfpuv/duvida_sincera_de_um_leigo/
+74,neutro,0,0.1,0.05,0.3,~2026-10-30,"B3SA3, BBAS3, BBDC3",Reddit r/AtivosFinanceiros,sugere acompanhar apresentações de resultados,
+75,negativo,0,0.1,0.05,0.3,~2026-10-30,"B3SA3, BBAS3, BBDC3",Reddit r/AtivosFinanceiros,"recomenda ETFs globais (MUND11, B5P211) no lugar de stock picking",https://www.reddit.com/r/AtivosFinanceiros/comments/1xjodnc/investimento/
+76,positivo,0,0.1,0.05,0.1,~2026-10-30,BBDC3,Reddit r/AtivosFinanceiros,"parabeniza e sugere aumentar posição, em especial Bradesco, se o preço persistir",https://www.reddit.com/r/AtivosFinanceiros/comments/1xjodnc/investimento/
+77,negativo,0.4,0.1,0.1,0.2,2026-11-05,"B3SA3, BBAS3, BBDC3",Reddit r/AtivosFinanceiros,manda vender tudo e comprar MUND11 e DIVO11 50/50,
+78,positivo,0,0.1,0.05,0.1,2026-11-04,BBAS3,Instagram,crises passadas mostram robustez do BB,
+79,neutro,0,0.1,0.05,0.3,2026-11-02,BBAS3,Instagram,diz que é preciso comprar na baixa e reinvestir dividendos com paciência,https://www.instagram.com/reel/DfNLbNmOHP0/
+80,positivo,0,0.3,0.05,0.1,2026-11-02,BBAS3,Instagram,espera mais 'promoções' do BB para aportar pesado,https://www.instagram.com/reel/DfNLbNmOHP0/
+81,neutro,0,0.1,0.05,0.8,2026-11-01,Itaú (fora da lista),Instagram,defende investir no Itaú a R$38,
+82,positivo,0.3,0.4,0.1,0.1,2026-11-01,BBAS3,Instagram,rebate crítico chamando de 'bolsonarista derrotado' e diz seguir firme no BB,https://www.instagram.com/reel/DfNLbNmOHP0/
+83,negativo,0.4,0.3,0.05,0.4,2026-11-01,BBAS3 / ativos em reais,Instagram,"'moeda fraca, fica em dólar, euro e libra'",https://www.instagram.com/reel/DfNLbNmOHP0/
+84,neutro,0.3,0.3,0.05,0.3,2026-11-01,BBAS3,Instagram,rebate críticos: quem mais critica não tem 1 real investido,https://www.instagram.com/reel/DfNLbNmOHP0/
+85,neutro,0,0.1,0.05,0.7,~2026-10-30,PETR4,Instagram,pergunta qual outra ação o autor indicaria,https://www.instagram.com/reel/DesREJBB3zz/
+86,negativo,0,0.1,0.05,0.1,~2026-10-23,PETR4,Instagram,chama de 'senhora furada': comprou R$300 por volta de 2007 e não recuperou,https://www.instagram.com/reel/DesREJBB3zz/
+87,positivo,0.2,0.1,0.05,0.3,~2026-10-23,PETR4,Instagram,critica a venda de empresas estratégicas como 'típico bolsonarista',
+88,neutro,0.6,0.9,0.05,0.7,~2026-10-23,PETR4,Instagram,meme político 'Faz o L',https://www.instagram.com/reel/DesREJBB3zz/
+89,positivo,0,0.1,0.05,0.1,~2026-10-23,PETR4,Instagram,vai esperar mais um pouco para vender,https://www.instagram.com/reel/DesREJBB3zz/
+90,neutro,0,0.1,0.05,0.1,~2026-10-23,PETR4,Instagram,indeciso entre vender e aproveitar a alta ou segurar por expectativa de mais valorização,https://www.instagram.com/reel/DesREJBB3zz/
+91,positivo,0.4,0.3,0.1,0.1,2026-10-20 em diante,CMIG4,Instagram,"diz que tem que aportar agora, senão 'privatiza igual Copasa'",https://www.instagram.com/reel/DeuGXshi4aO/
+92,neutro,0,0.1,0.1,0.3,2026-10-20 em diante,CMIG4,Instagram,"pergunta se é ON ou PN e cita preço-alvo de R$13,24 no app",https://www.instagram.com/reel/DeuGXshi4aO/
+93,neutro,0,0.1,0.3,0.2,2026-10-20 em diante,CMIG4,Instagram,concorda com o preço-teto,
+94,positivo,0.1,0.2,0.1,0.2,2026-10-20 em diante,CMIG4,Instagram,está aportando: 'a hora de comprar é quando ninguém quer',https://www.instagram.com/reel/DeuGXshi4aO/
+95,neutro,0,0.1,0.7,0.5,2026-10-20 em diante,CMIG4,Instagram,'na plataforma AGF tem sugestão de compra',
+96,positivo,0,0.1,0.1,0.1,~2026-10-23,CMIG4,Instagram,"gosta da Cemig, investe no longo prazo e segue comprando",https://www.instagram.com/reel/DefT_vsCIQ1/
+97,positivo,0,0.1,0.1,0.1,~2026-10-23,CMIG4,Instagram,"tem Cemig e vai comprar mais, 'ótima empresa'",https://www.instagram.com/reel/DefT_vsCIQ1/
+98,neutro,0,0.1,0.95,0.95,~2026-11-01,CMIG4,Instagram,comentário só com a palavra-chave 'Bf26' (captação de leads da live do criador),https://www.instagram.com/reel/DefT_vsCIQ1/
+99,neutro,0,0.1,0.95,0.95,~2026-10-30,CMIG4,Instagram,comentário só com a palavra-chave 'BF26' (captação de leads),https://www.instagram.com/reel/DefT_vsCIQ1/
+100,neutro,0,0.1,0.4,0.8,2026-11-05,CMIG4,Instagram,'parabéns pelo trabalho',

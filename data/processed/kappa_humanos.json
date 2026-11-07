@@ -1,0 +1,13 @@
+{
+  "n": 100,
+  "kappa_sentimento": 0.8107255520504731,
+  "kappa_sentimento_ponderado": 0.8450413223140496,
+  "kappa_ironia": 0.9681528662420382,
+  "concordancia_bruta_ironia": 0.99,
+  "kappa_giria_meme": 0.5806451612903225,
+  "concordancia_bruta_giria_meme": 0.87,
+  "kappa_suspeita_coordenacao": 1.0,
+  "concordancia_bruta_suspeita_coordenacao": 1.0,
+  "kappa_irrelevante": 0.8120300751879699,
+  "concordancia_bruta_irrelevante": 0.93
+}

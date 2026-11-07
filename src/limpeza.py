@@ -19,10 +19,15 @@ def sem_acento(s: str) -> str:
 
 
 def carregar_posts(caminho=None) -> pd.DataFrame:
-    """Lê o snapshot (parquet ou csv) de data/raw e valida o schema mínimo."""
+    """Lê o snapshot (parquet ou csv) de data/raw ou data/ e padroniza colunas do schema."""
     if caminho is None:
-        for nome in config.POSTS_RAW_CANDIDATOS:
-            p = config.DATA_RAW / nome
+        candidatos = [
+            config.DATA_RAW / "posts.parquet",
+            config.DATA_RAW / "posts.csv",
+            config.RAIZ / "data" / "posts.parquet",
+            config.RAIZ / "data" / "posts.csv",
+        ]
+        for p in candidatos:
             if p.exists():
                 caminho = p
                 break
@@ -30,6 +35,19 @@ def carregar_posts(caminho=None) -> pd.DataFrame:
             raise FileNotFoundError("Coloque o snapshot em data/raw/posts.parquet ou posts.csv")
     caminho = str(caminho)
     df = pd.read_parquet(caminho) if caminho.endswith(".parquet") else pd.read_csv(caminho)
+
+    # Adapta nomes de colunas alternativos presentes no dataset real
+    if "texto" not in df.columns and "comentario_resumo" in df.columns:
+        df["texto"] = df["comentario_resumo"]
+    if "data_hora" not in df.columns and "data" in df.columns:
+        datas_extraidas = df["data"].astype(str).str.extract(r"(\d{4}-\d{2}-\d{2})")[0]
+        base_datas = pd.to_datetime(datas_extraidas, errors="coerce").fillna(pd.Timestamp("2026-11-01"))
+        df["data_hora"] = base_datas + pd.Timedelta(hours=14)  # 14h BRT (durante o pregão)
+    if "plataforma" not in df.columns and "fonte" in df.columns:
+        df["plataforma"] = df["fonte"]
+    if "autor_id" not in df.columns:
+        df["autor_id"] = "autor_" + df["id"].astype(str)
+
     faltam = [c for c in config.COLUNAS_OBRIGATORIAS if c not in df.columns]
     if faltam:
         raise ValueError(f"Colunas ausentes no snapshot: {faltam}")
@@ -126,7 +144,13 @@ def limpar_posts(df: pd.DataFrame, tz_origem: str = "UTC") -> pd.DataFrame:
     # duplicata exata = mesmo autor + mesmo texto + mesmo instante
     out = out.drop_duplicates(subset=["autor_id", "texto", "data_hora"])
     out["texto_norm"] = out["texto"].map(normalizar_texto)
-    out["tickers"] = out["texto"].map(extrair_tickers)
+    if "ativo" in out.columns:
+        out["tickers"] = [
+            sorted(set(extrair_tickers(t)) | set(extrair_tickers(a)))
+            for t, a in zip(out["texto"], out["ativo"].fillna(""))
+        ]
+    else:
+        out["tickers"] = out["texto"].map(extrair_tickers)
     out["n_tickers"] = out["tickers"].str.len()
     out["tamanho_texto"] = out["texto"].str.len()
     out = out.sort_values("data_hora").reset_index(drop=True)

@@ -119,7 +119,7 @@ def ajustar(painel: pd.DataFrame, dv: str, controles: list[str], efeitos_fixos: 
     """OLS com erros-padrão robustos. Retorna o resultado do statsmodels ou None se a amostra é insuficiente."""
     cols = ["indice", dv, *controles, "ticker", "data"]
     d = painel[cols].replace([np.inf, -np.inf], np.nan).dropna()
-    if len(d) < 30 or d["indice"].nunique() < 2:
+    if len(d) < 10 or d["indice"].nunique() < 2:
         return None
     # controles constantes são colineares com o intercepto (covariância singular): descarta
     controles = [c for c in controles if d[c].nunique() > 1]
@@ -128,12 +128,16 @@ def ajustar(painel: pd.DataFrame, dv: str, controles: list[str], efeitos_fixos: 
     n_t = d["ticker"].nunique()
     cod = pd.factorize(d["ticker"])[0]
     mod = smf.ols(form, data=d)
-    if n_t >= 10:
-        res = mod.fit(cov_type="cluster", cov_kwds={"groups": cod})
-    elif n_t == 1:
-        res = mod.fit(cov_type="HAC", cov_kwds={"maxlags": config.HAC_LAGS})
-    else:
-        res = mod.fit(cov_type="hac-panel", cov_kwds={"groups": cod, "maxlags": config.HAC_LAGS})
+    maxlags = min(config.HAC_LAGS, max(1, len(d) // 5))
+    try:
+        if n_t >= 10:
+            res = mod.fit(cov_type="cluster", cov_kwds={"groups": cod})
+        elif n_t == 1:
+            res = mod.fit(cov_type="HAC", cov_kwds={"maxlags": maxlags})
+        else:
+            res = mod.fit(cov_type="hac-panel", cov_kwds={"groups": cod, "maxlags": maxlags})
+    except Exception:
+        res = mod.fit(cov_type="HC1")
     res._n_tickers = n_t  # type: ignore[attr-defined]
     return res
 

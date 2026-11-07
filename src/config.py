@@ -84,6 +84,6 @@ HAC_LAGS = 5
 ALFA = 0.05
 
 # LLM
-LLM_MODEL_PADRAO = "gemini-3.8-flash"
+LLM_MODEL_PADRAO = "gemini-3.1-flash-lite"
 LLM_BATCH = 20
 LLM_MAX_RETRIES = 3

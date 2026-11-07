@@ -98,7 +98,8 @@ def decode_tabular(texto: str, nome: str | None = None) -> list[dict]:
         raise ValueError(f"TOON declara {n_decl} linhas, recebi {len(corpo)}")
     out = []
     for l in corpo:
-        toks = _split(l.strip())
+        l_limpa = re.sub(r'""([^"]+?)""', r'"\1"', l.strip())
+        toks = _split(l_limpa)
         if len(toks) != len(campos):
             raise ValueError(f"linha com {len(toks)} colunas, esperado {len(campos)}")
         out.append({c: _tipar(t) for c, t in zip(campos, toks)})
